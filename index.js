@@ -11,7 +11,7 @@ const app = express();
 //app.use( multer().any())
 app.use(express.json());
 app.use(cors());
-
+console.log(process.env.cluster)
 mongoose
   .connect(
     process.env.cluster,
