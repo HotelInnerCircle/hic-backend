@@ -1,8 +1,6 @@
 
 const roomModel = require("../models/roomsModel")
 
-
-
 const createRooms = async(req,res)=>{
 try {
     let data = req.body
@@ -69,7 +67,7 @@ let updateRooms = async (req,res)=>{
 
 const getRooms = async(req,res)=>{
     try {
-        let data = await roomModel.find({isDeleted:false})
+        let data = await roomModel.find({isDeleted:false, is_block:false})
         if(!data){
             return res.status(404).send({status:false,message:"no data found"})
         }
@@ -83,7 +81,7 @@ const getRooms = async(req,res)=>{
 
 module.exports= {
     createRooms ,
-     getRooms,
-      updateRooms , 
+    getRooms,
+    updateRooms , 
     //   addRoom
     }

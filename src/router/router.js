@@ -8,12 +8,9 @@ const {
   updateRooms,
 } = require("../controller/roomController");
 
-const {
-  // createRoom,
-  createBooking,
-  updateBookings,
-} = require("../controller/BookRoomController");
+const { bookedRooms, updateBookings }= require("../controller/BookRoomController");
 
+const {contactus, getContactUs} = require("../controller/contactusController")
 router.get("/test-me", function (req, res) {
   res.send("this is successfully created");
 });
@@ -28,9 +25,9 @@ router.post("/login", login);
 router.post("/createRooms", createRooms);
 router.get("/getRooms", getRooms);
 router.put("/updateRooms", updateRooms);
-
-router.post("/createBooking", createBooking);
-router.put("/updateBookings/:bookingID", updateBookings);
+//=======================================================================
+router.post("/bookedRooms",bookedRooms)
+router.get("/updateBookings",updateBookings)
 
 module.exports = router;
 

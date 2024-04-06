@@ -1,49 +1,53 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const moment = require("moment");
 require("moment-timezone");
 
 moment.tz.setDefault("Asia/Kolkata");
 let dates = moment().format("YYYY-MM-DD");
 let times = moment().format("HH:mm:ss");
-const bookingSchema = new mongoose.Schema({
-      RoomType: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'rooms',
-            required: true
-        },
-    noOfRoomsAvailable: {
-        type: Number,
-        default: 50,
+const bookingSchema = new mongoose.Schema(
+  {
+    RoomType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "rooms",
+      required: true,
     },
-  bookedRoomsNumber :{
-    type: Number,
-        default: 0,
-  },
+    totalRooms: {
+      type: Number,
+      default: 50,
+    },
+    noOfRoomsAvailable: {
+      type: Number,
+      default: 50,
+    },
+    notAvailableRooms: {
+      type: Number,
+      default: 0,
+    },
     is_Available: {
-        type: Boolean,
-        default: true
+      type: Boolean,
+      default: true,
     },
     BookedDate: {
-        type: Date,
-       
+      type: Date,
     },
     date: {
-        type: String,
-        default:dates
+      type: String,
+      default: dates,
     },
-    time:{
-        type:String,
-        default:times
+    time: {
+      type: String,
+      default: times,
     },
     deletedAt: {
-        type: Date
+      type: Date,
     },
     isDeleted: {
-        type: Boolean,
-        default: false
+      type: Boolean,
+      default: false,
     },
-    
-  
-}, { timestamps: true })
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('booking', bookingSchema)
+module.exports = mongoose.model("booking", bookingSchema);
