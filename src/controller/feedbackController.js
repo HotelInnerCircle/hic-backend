@@ -1,18 +1,19 @@
-const contactUsModel = require("../models/contactusModel")
+const feedbackModel = require("../models/feedbacksModel")
 
-const contactus = async (req,res)=>{
+
+const feedback = async (req,res)=>{
     try {
         let data = req.body
-        let saveData = await contactUsModel.create(data)
+        let saveData = await feedbackModel.create(data)
         return res.status(201).send({status:true,data:saveData})
     } catch (error) {
-        return res.status(500).send({status:false, message:error.message})
+        return res.status(500).send({status:false, message:error.message}) 
     }
 }
 
-const getContactUs = async (req,res)=>{
+const getfeedbacks = async (req,res)=>{
     try {
-        let data = await contactUsModel.find({isDeleted:false})
+        let data = await feedbackModel.find({isDeleted:false})
         if(!data){
             return res.status(404).send({status:false,message:"no data found"})
         }
@@ -20,7 +21,9 @@ const getContactUs = async (req,res)=>{
     } catch (error) {
         return res.status(500).send({status:false, message:error.message}) 
     }
-}
+} 
 
 
-module.exports = {contactus, getContactUs}
+
+
+module.exports = {feedback , getfeedbacks}

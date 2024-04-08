@@ -7,7 +7,7 @@ let dates = moment().format("YYYY-MM-DD");
 let times = moment().format("HH:mm:ss");
 const bookingSchema = new mongoose.Schema(
   {
-    RoomType: {
+    roomType: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "rooms",
       required: true,
@@ -28,7 +28,7 @@ const bookingSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    BookedDate: {
+    bookedDate: {
       type: Date,
     },
     date: {
