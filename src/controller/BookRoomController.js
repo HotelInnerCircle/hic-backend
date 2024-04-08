@@ -14,7 +14,7 @@ const bookingModel = require("../models/bookingModel");
 const bookedRooms = async (req, res) => {
   try {
     let data = req.body;
-    let room_id = data.RoomType;
+    let room_id = data.roomType;
     let find_the_room = await roomModel.findById({ _id: room_id });
     if (!find_the_room) {
       return res
