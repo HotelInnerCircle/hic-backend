@@ -20,7 +20,7 @@ const contactUsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    name:{
+    message:{
         type: String,
         required: true
     },

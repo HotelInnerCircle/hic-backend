@@ -11,6 +11,8 @@ const {
 const {
   bookedRooms,
   updateBookings,
+  getBookedRooms,
+  getBookedroomBydate
 } = require("../controller/BookRoomController");
 
 const {
@@ -35,7 +37,9 @@ router.get("/getRooms", getRooms);
 router.put("/updateRooms", updateRooms);
 //=======================================================================
 router.post("/bookedRooms", bookedRooms);
-router.get("/updateBookings", updateBookings);
+router.put("/updateBookings/:bookingID", updateBookings);
+router.get("/getBookedRooms",getBookedRooms)
+router.get("/getBookedroomBydate",getBookedroomBydate)
 //========================================================================
 router.post("/contactus", contactus);
 router.get("/getContactUs", getContactUs);
