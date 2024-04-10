@@ -1,9 +1,19 @@
 const feedbackModel = require("../models/feedbacksModel")
+const moment = require("moment");
+require("moment-timezone");
 
+moment.tz.setDefault("Asia/Kolkata");
+let dates = moment().format("YYYY-MM-DD");
+let times = moment().format("HH:mm:ss");
 
 const feedback = async (req,res)=>{
     try {
         let data = req.body
+        moment.tz.setDefault("Asia/Kolkata");
+        let dates = moment().format("YYYY-MM-DD");
+        let times = moment().format("HH:mm:ss");
+        data.date = dates;
+        data.time = times;
         let saveData = await feedbackModel.create(data)
         return res.status(201).send({status:true,data:saveData})
     } catch (error) {
