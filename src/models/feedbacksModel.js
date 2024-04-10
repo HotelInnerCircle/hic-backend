@@ -11,7 +11,7 @@ const feedBackSchema = new mongoose.Schema(
     name: { type: String, required: true },
     phone: { type: String, required: true },
     email: { type: String, required: true },
-    roomType: {type: mongoose.Schema.Types.ObjectId,ref: "rooms", required: true,},
+    roomType: {type: String, required: true,},
     roomNo: { type: Number, required: true },
     rating: { type: Number, required: true },
     subject: { type: String, required: true },
