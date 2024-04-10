@@ -1,4 +1,4 @@
-
+const mongoose = require("mongoose")
 const moment = require("moment");
 require("moment-timezone");
 
@@ -15,7 +15,7 @@ const bookingModel = require("../models/bookingModel");
 //   } catch (error) {
 //     return res.status(500).send({ status: false, message: error.message });
 //   }
-// }; 
+// };
 
 const bookedRooms = async (req, res) => {
   try {
@@ -28,16 +28,14 @@ const bookedRooms = async (req, res) => {
         .send({ status: false, message: "no room is present" });
     }
     if (data.noOfRoomsAvailable > data.totalRooms) {
-      return res
-        .status(404)
-        .send({
-          status: false,
-          message: "available rooms should be less than total rooms",
-        });
+      return res.status(404).send({
+        status: false,
+        message: "available rooms should be less than total rooms",
+      });
     }
-    data.notAvailableRooms= data.totalRooms-data.noOfRoomsAvailable
-    if(data.notAvailableRooms<=0){
-      data.is_Available = false
+    data.notAvailableRooms = data.totalRooms - data.noOfRoomsAvailable;
+    if (data.notAvailableRooms <= 0) {
+      data.is_Available = false;
     }
     // data.bookedDate = moment(data.bookedDate).format("YYYY-MM-DD");
     let saveData = await bookingModel.create(data);
@@ -79,63 +77,76 @@ const updateBookings = async (req, res) => {
   }
 };
 
-const getBookedRooms = async (req,res)=>{
+const getBookedRooms = async (req, res) => {
   try {
-    filter = {isDeleted:false,is_Available:true}
-    getdata = await bookingModel.find(filter)
+    filter = { isDeleted: false, is_Available: true };
+    getdata = await bookingModel.find(filter);
     return res.status(200).send({ status: true, data: getdata });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
-}
+};
 
 const getBookedroomBydate = async (req, res) => {
   try {
-     let { checkIn, checkOut } = req.query;
- 
-     // Convert checkIn and checkOut strings to Date objects
-     checkIn = new Date(checkIn);
-     checkOut = new Date(checkOut);
- 
-     // Find bookings within the date range
-     const filteredBookings = await bookingModel.find({
-       bookedDate: {
-         $gte: checkIn.toISOString().slice(0, 10),
-         $lte: checkOut.toISOString().slice(0, 10)
-       },
-       isDeleted:false,
-       is_Available:true
-     });
- 
-     // Group bookings by roomType and calculate available rooms
-     const roomTypeAvailability = {};
-     filteredBookings.forEach(booking => {
-       if (!roomTypeAvailability[booking.roomType]) {
-         roomTypeAvailability[booking.roomType] = {
-           totalRooms: booking.totalRooms,
-           bookedRooms: 0
-         };
-       }
-       roomTypeAvailability[booking.roomType].bookedRooms += booking.noOfRoomsAvailable;
-     });
- 
-     // Determine if rooms are available
-     const roomsAvailable = Object.values(roomTypeAvailability).every(roomType => {
-       return roomType.totalRooms - roomType.bookedRooms > 0;
-     });
- 
-     if (!roomsAvailable) {
-       return res.status(404).send({ status: false, message: "Rooms are not available" });
-     }
-     if(filteredBookings.length==0){
-            return res.status(200).send({ status: false, message: "All Rooms are available" });
-     }
- 
-     return res.status(200).send({ status: true, data: filteredBookings });
-  } catch (error) {
-     return res.status(500).send({ status: false, message: error.message });
-  }
- };
- 
+    let { checkIn, checkOut, room } = req.query;
 
-module.exports = { bookedRooms, updateBookings, getBookedRooms, getBookedroomBydate };
+    // Convert checkIn and checkOut strings to Date objects
+    checkIn = new Date(checkIn);
+    checkOut = new Date(checkOut);
+
+    // Array to hold dates within the specified range
+    const datesInRange = [];
+    let currentDate = new Date(checkIn);
+    while (currentDate <= checkOut) {
+      datesInRange.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+    }
+
+    // Find bookings within each date in the range
+    const availability = await Promise.all(
+      datesInRange.map(async (date) => {
+        const bookings = await bookingModel.find({
+          bookedDate: date,
+          roomType: room
+        });
+        return { date, bookings };
+      })
+    );
+
+    // console.log("Availability:", availability);
+
+    // Check if rooms are available for each date
+    const isAvailable = availability.every(({ date, bookings }) => {
+      // If there are no bookings for the date, consider all rooms available
+      if (bookings.length === 0) {
+        return true;
+      }
+      
+      const totalAvailableRoomsForDate = bookings.reduce(
+        (total, booking) => total + booking.noOfRoomsAvailable,
+        0
+      );
+      return totalAvailableRoomsForDate > 0;
+    });
+
+    if (!isAvailable) {
+      return res
+        .status(404)
+        .send({ status: false, message: "Rooms are not available for the specified dates" });
+    }
+
+    return res.status(200).send({ status: true, message: "Rooms are available for the specified dates" });
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+};
+
+
+
+module.exports = {
+  bookedRooms,
+  updateBookings,
+  getBookedRooms,
+  getBookedroomBydate,
+};
