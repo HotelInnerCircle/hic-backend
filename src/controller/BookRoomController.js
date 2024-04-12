@@ -91,6 +91,11 @@ const getBookedroomBydate = async (req, res) => {
   try {
     let { checkIn, checkOut, room } = req.query;
 
+    // Check if the required parameters are provided
+    if (!checkIn || !checkOut) {
+      return res.status(400).send({ status: false, message: "Please provide check-in and check-out dates" });
+    }
+
     // Convert checkIn and checkOut strings to Date objects
     checkIn = new Date(checkIn);
     checkOut = new Date(checkOut);
@@ -106,15 +111,14 @@ const getBookedroomBydate = async (req, res) => {
     // Find bookings within each date in the range
     const availability = await Promise.all(
       datesInRange.map(async (date) => {
-        const bookings = await bookingModel.find({
-          bookedDate: date,
-          roomType: room
-        });
+        let query = { bookedDate: date };
+        if (room) {
+          query.roomType = room;
+        }
+        const bookings = await bookingModel.find(query);
         return { date, bookings };
       })
     );
-
-    // console.log("Availability:", availability);
 
     // Check if rooms are available for each date
     const isAvailable = availability.every(({ date, bookings }) => {
@@ -122,7 +126,8 @@ const getBookedroomBydate = async (req, res) => {
       if (bookings.length === 0) {
         return true;
       }
-      
+
+      // If room parameter is not provided, sum up available rooms for all room types
       const totalAvailableRoomsForDate = bookings.reduce(
         (total, booking) => total + booking.noOfRoomsAvailable,
         0
@@ -136,11 +141,12 @@ const getBookedroomBydate = async (req, res) => {
         .send({ status: false, message: "Rooms are not available for the specified dates" });
     }
 
-    return res.status(200).send({ status: true, message: "Rooms are available for the specified dates" });
+    return res.status(200).send({ status: true, message: "Rooms are available for the specified dates", data: availability });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
 };
+
 
 
 
