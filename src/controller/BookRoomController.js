@@ -127,7 +127,6 @@ const getBookedroomBydate = async (req, res) => {
     // Convert checkIn and checkOut strings to Date objects
     checkIn = new Date(checkIn);
     checkOut = new Date(checkOut);
-
     // Array to hold dates within the specified range
     const datesInRange = [];
     let currentDate = new Date(checkIn);
@@ -135,7 +134,6 @@ const getBookedroomBydate = async (req, res) => {
       datesInRange.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
     }
-
     // Find bookings within each date in the range
     const availability = await Promise.all(
       datesInRange.map(async (date) => {
@@ -143,31 +141,38 @@ const getBookedroomBydate = async (req, res) => {
         if (room) {
           query.roomType = room;
         }
+        // query.noOfRoomsAvailable = { $gt: 0 };
         const bookings = await bookingModel.find(query);
-        
-        // Filter out rooms where noOfRoomsAvailable is 0 if room ID is not given
-        if (!room) {
-          return { date, bookings: bookings.filter(booking => booking.noOfRoomsAvailable > 0) };
-        }
-        
         return { date, bookings };
       })
     );
 
     // Check if rooms are available for each date
     const isAvailable = availability.every(({ date, bookings }) => {
-      return bookings.some(booking => booking.noOfRoomsAvailable > 0);
-    });
+      // If there are no bookings for the date, consider all rooms available
+      if (bookings.length === 0) {
+        return true;
+      }
 
+      // If room parameter is not provided, sum up available rooms for all room types
+      const totalAvailableRoomsForDate = bookings.reduce(
+        (total, booking) => total + booking.noOfRoomsAvailable,
+        0
+      );
+      return totalAvailableRoomsForDate > 0;
+    });
     if (!isAvailable) {
-      return res.status(404).send({ status: false , isAvailable:false, message: "Rooms are not available for the specified dates" });
+      return res
+        .status(404)
+        .send({ status: false,isAvailable:false, message: "Rooms are not available for the specified dates" });
     }
 
-    return res.status(200).send({ status: true , isAvailable:true, message: "Rooms are available for the specified dates", data: availability });
+    return res.status(200).send({ status: true,isAvailable:true, message: "Rooms are available for the specified dates", data: availability });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
 };
+
 
 
 
