@@ -48,34 +48,62 @@ const bookedRooms = async (req, res) => {
 const updateBookings = async (req, res) => {
   try {
     let bookingID = req.params.bookingID;
-    // let booked_date = req.params.bookedDate
     let data = req.body;
-    // let find_the_room = await roomModel.findById({ _id: data.roomID });
-    // if (!find_the_room) {
-    //   return res
-    //     .status(404)
-    //     .findById({ status: false, message: "no room is present" });
-    // }
+
     let check_bookingID_exist = await bookingModel.findOne({ _id: bookingID });
 
     if (!check_bookingID_exist) {
-      return res.status(201).send({ status: false, message: "no booking id" });
+      return res.status(404).send({ status: false, message: "Booking ID not found" });
     } else {
-      let find_booking = await bookingModel.findByIdAndUpdate(
-        { _id: bookingID },
-        {
-          noOfRoomsAvailable: data.noOfRoomsAvailable,
-          bookedRoomsNumber: data.bookedRoomsNumber,
-        },
-        { new: true }
-      );
+      // If noOfRoomsAvailable is provided in the request body, update it and adjust notAvailableRooms and is_Available accordingly
+      if (data.noOfRoomsAvailable !== undefined) {
+        let totalRooms = check_bookingID_exist.totalRooms;
+        let noOfRoomsAvailable = data.noOfRoomsAvailable;
 
-      return res.status(200).send({ status: true, data: find_booking });
+        // If noOfRoomsAvailable exceeds totalRooms, set it to totalRooms
+        if (noOfRoomsAvailable > totalRooms) {
+          return res.status(400).send({ status: false, message: "available rooms are greater than total" });
+        }
+
+        // If noOfRoomsAvailable equals totalRooms, set notAvailableRooms to 0 and is_Available to false
+        let notAvailableRooms = 0;
+        let isAvailable = true;
+        if (noOfRoomsAvailable === totalRooms) {
+          notAvailableRooms = 0;
+          isAvailable = false;
+        } else {
+          notAvailableRooms = totalRooms - noOfRoomsAvailable;
+        }
+
+        // Update the booking with the new values
+        let find_booking = await bookingModel.findByIdAndUpdate(
+          { _id: bookingID },
+          {
+            noOfRoomsAvailable: noOfRoomsAvailable,
+            notAvailableRooms: notAvailableRooms,
+            is_Available: isAvailable,
+            bookedRoomsNumber: data.bookedRoomsNumber,
+          },
+          { new: true }
+        );
+
+        return res.status(200).send({ status: true, data: find_booking });
+      } else {
+        // If noOfRoomsAvailable is not provided in the request body, simply update the bookedRoomsNumber
+        let find_booking = await bookingModel.findByIdAndUpdate(
+          { _id: bookingID },
+          { bookedRoomsNumber: data.bookedRoomsNumber },
+          { new: true }
+        );
+
+        return res.status(200).send({ status: true, data: find_booking });
+      }
     }
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
 };
+
 
 const getBookedRooms = async (req, res) => {
   try {
@@ -116,32 +144,26 @@ const getBookedroomBydate = async (req, res) => {
           query.roomType = room;
         }
         const bookings = await bookingModel.find(query);
+        
+        // Filter out rooms where noOfRoomsAvailable is 0 if room ID is not given
+        if (!room) {
+          return { date, bookings: bookings.filter(booking => booking.noOfRoomsAvailable > 0) };
+        }
+        
         return { date, bookings };
       })
     );
 
     // Check if rooms are available for each date
     const isAvailable = availability.every(({ date, bookings }) => {
-      // If there are no bookings for the date, consider all rooms available
-      if (bookings.length === 0) {
-        return true;
-      }
-
-      // If room parameter is not provided, sum up available rooms for all room types
-      const totalAvailableRoomsForDate = bookings.reduce(
-        (total, booking) => total + booking.noOfRoomsAvailable,
-        0
-      );
-      return totalAvailableRoomsForDate > 0;
+      return bookings.some(booking => booking.noOfRoomsAvailable > 0);
     });
 
     if (!isAvailable) {
-      return res
-        .status(404)
-        .send({ status: false, message: "Rooms are not available for the specified dates" });
+      return res.status(404).send({ status: false , isAvailable:false, message: "Rooms are not available for the specified dates" });
     }
 
-    return res.status(200).send({ status: true, message: "Rooms are available for the specified dates", data: availability });
+    return res.status(200).send({ status: true , isAvailable:true, message: "Rooms are available for the specified dates", data: availability });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
