@@ -6,6 +6,7 @@ moment.tz.setDefault("Asia/Kolkata");
 
 const roomModel = require("../models/roomsModel");
 const bookingModel = require("../models/bookingModel");
+const { checkout } = require("../router/router");
 
 // const bookedRooms = async (req, res) => {
 //   try {
@@ -167,7 +168,7 @@ const getBookedroomBydate = async (req, res) => {
         .send({ status: false,isAvailable:false, message: "Rooms are not available for the specified dates" });
     }
 
-    return res.status(200).send({ status: true,isAvailable:true, message: "Rooms are available for the specified dates", data: availability });
+    return res.status(200).send({ status: true,isAvailable:true, message: `Rooms are available for the ${checkIn} and ${checkOut}`, data: availability });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
