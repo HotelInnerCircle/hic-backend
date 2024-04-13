@@ -135,33 +135,44 @@ const getBookedroomBydate = async (req, res) => {
       datesInRange.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
     }
-    // Find bookings within each date in the range
-    const availability = await Promise.all(
-      datesInRange.map(async (date) => {
-        let query = { bookedDate: date };
-        if (room) {
-          query.roomType = room;
-        }
-        // query.noOfRoomsAvailable = { $gt: 0 };
-        const bookings = await bookingModel.find(query);
-        return { date, bookings };
-      })
-    );
+   // Find bookings within each date in the range
+const availability = await Promise.all(
+  datesInRange.map(async (date) => {
+    let query = { bookedDate: date };
+    if (room) {
+      query.roomType = room;
+    }
+    // query.noOfRoomsAvailable = { $gt: 0 };
+    const bookings = await bookingModel.find(query);
+    return { date, bookings };
+  })
+);
 
-    // Check if rooms are available for each date
-    const isAvailable = availability.every(({ date, bookings }) => {
-      // If there are no bookings for the date, consider all rooms available
-      if (bookings.length === 0) {
-        return true;
+// Check if rooms are available for each date
+const isAvailable = availability.every(({ date, bookings }, index) => {
+  // If there are no bookings for the date, consider all rooms available
+  if (bookings.length === 0) {
+    // Update the existing entry in the array with the message
+    availability[index] = { date, message: "All rooms are available." };
+    return true;
+  }
+  console.log(bookings);
+  // If room parameter is not provided, sum up available rooms for all room types
+  const totalAvailableRoomsForDate = bookings.reduce(
+    (total, booking) => {
+      // Check if the booking is deleted, if so, mark it as not available
+      if (booking.isDeleted) {
+        // console.log('Booking is deleted:', booking);
+        return total;
       }
+      return total + booking.noOfRoomsAvailable;
+    },
+    0
+  );
+  return totalAvailableRoomsForDate > 0;
+});
 
-      // If room parameter is not provided, sum up available rooms for all room types
-      const totalAvailableRoomsForDate = bookings.reduce(
-        (total, booking) => total + booking.noOfRoomsAvailable,
-        0
-      );
-      return totalAvailableRoomsForDate > 0;
-    });
+
     if (!isAvailable) {
       return res
         .status(404)
