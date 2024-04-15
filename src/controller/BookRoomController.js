@@ -6,7 +6,7 @@ moment.tz.setDefault("Asia/Kolkata");
 
 const roomModel = require("../models/roomsModel");
 const bookingModel = require("../models/bookingModel");
-const { checkout } = require("../router/router");
+
 
 // const bookedRooms = async (req, res) => {
 //   try {
@@ -179,14 +179,32 @@ const isAvailable = availability.every(({ date, bookings }, index) => {
         .send({ status: false,isAvailable:false, message: "Rooms are not available for the specified dates" });
     }
 
-    return res.status(200).send({ status: true,isAvailable:true, message: `Rooms are available for the ${checkIn} and ${checkOut}`, data: availability });
+    return res.status(200).send({ status: true,isAvailable:true, message: "Rooms are available", data: availability });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
 };
 
 
+const deleteBooking = async (req,res)=>{
+  try {
+    let bookingID = req.params.bookingID;
+    // let data = req.body;
 
+    let check_bookingID_exist = await bookingModel.findOne({ _id: bookingID });
+
+    if (!check_bookingID_exist) {
+      return res.status(404).send({ status: false, message: "Booking ID not found" });
+    } 
+    if(check_bookingID_exist.isDeleted==true){
+      return res.status(404).send({ status: false, message: "already deleted" });
+    }
+   await bookingModel.findByIdAndUpdate({_id: bookingID},{ isDeleted: true, deletedAt: Date.now() })
+    return res.status(200).send({ status: true, message: "Deleted Successfully" })
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+}
 
 
 module.exports = {
@@ -194,4 +212,5 @@ module.exports = {
   updateBookings,
   getBookedRooms,
   getBookedroomBydate,
+  deleteBooking
 };
