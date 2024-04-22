@@ -23,7 +23,7 @@ const feedback = async (req,res)=>{
 
 const getfeedbacks = async (req,res)=>{
     try {
-        let data = await feedbackModel.find({isDeleted:false})
+        let data = await feedbackModel.find({isDeleted:false}).sort({createdAt:-1})
         if(!data){
             return res.status(404).send({status:false,message:"no data found"})
         }

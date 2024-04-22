@@ -23,7 +23,7 @@ const guests = async (req,res)=>{
 
 const getGuest = async (req,res)=>{
     try {
-        let data = await guestModel.find({isDeleted:false})
+        let data = await guestModel.find({isDeleted:false}).sort({createdAt:-1})
         if(!data){
             return res.status(404).send({status:false,message:"no data found"})
         }

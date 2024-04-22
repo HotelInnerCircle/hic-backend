@@ -109,7 +109,7 @@ const updateBookings = async (req, res) => {
 const getBookedRooms = async (req, res) => {
   try {
     filter = { isDeleted: false, is_Available: true };
-    getdata = await bookingModel.find(filter);
+    getdata = await bookingModel.find(filter).sort({createdAt:-1});
     return res.status(200).send({ status: true, data: getdata });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });

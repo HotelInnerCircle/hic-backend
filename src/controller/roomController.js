@@ -67,7 +67,7 @@ let updateRooms = async (req,res)=>{
 
 const getRooms = async(req,res)=>{
     try {
-        let data = await roomModel.find({isDeleted:false, is_block:false})
+        let data = await roomModel.find({isDeleted:false, is_block:false}).sort({createdAt:-1})
         if(!data){
             return res.status(404).send({status:false,message:"no data found"})
         }
