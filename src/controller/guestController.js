@@ -43,7 +43,7 @@ const updateStatus = async (req,res)=>{
             return res.status(404).send({status:false,message:"no data found"}) 
         }
         let updateStatus = await guestModel.findByIdAndUpdate({_id:guestId},data,{new:true})
-        return res.status(404).send({status:true,data:updateStatus}) 
+        return res.status(200).send({status:true,data:updateStatus}) 
     } catch (error) {
         return res.status(500).send({status:false, message:error.message}) 
     }
