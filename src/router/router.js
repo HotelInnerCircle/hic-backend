@@ -24,7 +24,7 @@ const {
 
 const { feedback, getfeedbacks } = require("../controller/feedbackController");
 
-const {guests, getGuest} = require("../controller/guestController")
+const {guests, getGuest , updateStatus} = require("../controller/guestController")
 
 const {authentication,authorization} = require("../middleware/auth")
 router.get("/test-me", function (req, res) {
@@ -60,6 +60,6 @@ router.get("/getfeedbacks/:userId", authentication,authorization,getfeedbacks); 
 
 router.post("/guests", guests)
 router.get("/getGuest/:userId",authentication,authorization,getGuest)
-
+router.put("/updateStatus/:guestId/:userId",authentication,authorization,updateStatus)
 module.exports = router;
 

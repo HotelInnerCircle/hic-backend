@@ -33,5 +33,20 @@ const getGuest = async (req,res)=>{
     }
 } 
 
+//==========================================================================
+const updateStatus = async (req,res)=>{
+    try {
+        let guestId = req.params.guestId
+        let data = req.body
+        let findGuest = await guestModel.find({_id:guestId, isDeleted:false})
+        if(!findGuest){
+            return res.status(404).send({status:false,message:"no data found"}) 
+        }
+        let updateStatus = await guestModel.findByIdAndUpdate({_id:guestId},data,{new:true})
+        return res.status(404).send({status:true,data:updateStatus}) 
+    } catch (error) {
+        return res.status(500).send({status:false, message:error.message}) 
+    }
+}
 
-module.exports = {guests, getGuest}
+module.exports = {guests, getGuest, updateStatus}
