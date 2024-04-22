@@ -35,7 +35,7 @@ const bookedRooms = async (req, res) => {
       });
     }
     data.notAvailableRooms = data.totalRooms - data.noOfRoomsAvailable;
-    if (data.notAvailableRooms <= 0) {
+    if (data.noOfRoomsAvailable <= 0) {
       data.is_Available = false;
     }
     // data.bookedDate = moment(data.bookedDate).format("YYYY-MM-DD");
@@ -69,7 +69,7 @@ const updateBookings = async (req, res) => {
         // If noOfRoomsAvailable equals totalRooms, set notAvailableRooms to 0 and is_Available to false
         let notAvailableRooms = 0;
         let isAvailable = true;
-        if (noOfRoomsAvailable === totalRooms) {
+        if (noOfRoomsAvailable === 0) {
           notAvailableRooms = 0;
           isAvailable = false;
         } else {
@@ -206,11 +206,27 @@ const deleteBooking = async (req,res)=>{
   }
 }
 
+//================================================================================
+
+const getbookedRoomsByroomType = async (req,res)=>{
+  try {
+    
+    let bookedroom = req.params.room
+    let data = await bookingModel.find({roomType:bookedroom, isDeleted:false})
+    if(!data){
+      return res.status(404).send({status:false, message:"data not found"})
+    }
+    return res.status(200).send({status:true, data:data})
+  } catch (error) {
+    return res.status(500).send({ status: false, message: error.message });
+  }
+}
 
 module.exports = {
   bookedRooms,
   updateBookings,
   getBookedRooms,
   getBookedroomBydate,
-  deleteBooking
+  deleteBooking,
+  getbookedRoomsByroomType
 };

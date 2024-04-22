@@ -14,6 +14,7 @@ const {
   getBookedRooms,
   getBookedroomBydate,
   deleteBooking,
+  getbookedRoomsByroomType
 } = require("../controller/BookRoomController");
 
 const {
@@ -46,6 +47,7 @@ router.put("/updateBookings/:bookingID/:userId",authentication,authorization, up
 router.get("/getBookedRooms", getBookedRooms);
 router.get("/getBookedroomBydate", getBookedroomBydate);
 router.delete("/deleteBooking/:bookingID/:userId", authentication,authorization,deleteBooking); // by admin
+router.get("/getbookedRoomsByroomType/:room",getbookedRoomsByroomType)
 //========================================================================
 router.post("/contactus", contactus);
 router.get("/getContactUs/:userId", authentication,authorization,getContactUs); // by admin
