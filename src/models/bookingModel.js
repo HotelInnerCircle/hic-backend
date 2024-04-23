@@ -36,7 +36,14 @@ const bookingSchema = new mongoose.Schema(
       required: true,
     //   default: dates,
     },
-   
+    date: {
+        type: String,
+        default:dates
+    },
+    time:{
+        type:String,
+        default:times
+    },
     deletedAt: {
       type: Date,
     },

@@ -83,22 +83,23 @@ const updateBookings = async (req, res) => {
             noOfRoomsAvailable: noOfRoomsAvailable,
             notAvailableRooms: notAvailableRooms,
             is_Available: isAvailable,
-            bookedRoomsNumber: data.bookedRoomsNumber,
+            totalRooms: data.totalRooms,
           },
           { new: true }
         );
 
         return res.status(200).send({ status: true, data: find_booking });
-      } else {
-        // If noOfRoomsAvailable is not provided in the request body, simply update the bookedRoomsNumber
-        let find_booking = await bookingModel.findByIdAndUpdate(
-          { _id: bookingID },
-          { bookedRoomsNumber: data.bookedRoomsNumber },
-          { new: true }
-        );
-
-        return res.status(200).send({ status: true, data: find_booking });
       }
+      //  else {
+      //   // If noOfRoomsAvailable is not provided in the request body, simply update the bookedRoomsNumber
+      //   let find_booking = await bookingModel.findByIdAndUpdate(
+      //     { _id: bookingID },
+      //     { totalRooms: data.totalRooms },
+      //     { new: true }
+      //   );
+
+      //   return res.status(200).send({ status: true, data: find_booking });
+      // }
     }
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
