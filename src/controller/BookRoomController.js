@@ -38,6 +38,13 @@ const bookedRooms = async (req, res) => {
     if (data.noOfRoomsAvailable <= 0) {
       data.is_Available = false;
     }
+    let find_Boookings = bookingModel.find({roomType:room_id,bookedDate:data.bookedDate})
+    if(find_Boookings){
+      return res.status(404).send({
+        status: false,
+        message: "this room is already booked please update",
+      });
+    }
     // data.bookedDate = moment(data.bookedDate).format("YYYY-MM-DD");
     let saveData = await bookingModel.create(data);
     return res.status(201).send({ status: true, data: saveData });
