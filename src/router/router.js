@@ -26,7 +26,11 @@ const { feedback, getfeedbacks } = require("../controller/feedbackController");
 
 const {guests, getGuest , updateStatus} = require("../controller/guestController")
 
+const {banquetHall, getbanquetHall, updateStatusOfBanquetHall} = require("../controller/banquetHallController")
+
 const {authentication,authorization} = require("../middleware/auth")
+
+//=====================================================================
 router.get("/test-me", function (req, res) {
   res.send("this is successfully created");
 });
@@ -61,5 +65,9 @@ router.get("/getfeedbacks/:userId", authentication,authorization,getfeedbacks); 
 router.post("/guests", guests)
 router.get("/getGuest/:userId",authentication,authorization,getGuest)
 router.put("/updateStatus/:guestId/:userId",authentication,authorization,updateStatus)
+//=======================================================================
+router.post("/banquetHall",banquetHall)
+router.get("/getbanquetHall/:userId",authentication,authorization,getbanquetHall)
+router.put("/updateStatusOfBanquetHall/:banquetId/:userId",authentication,authorization,updateStatusOfBanquetHall)
 module.exports = router;
 
