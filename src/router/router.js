@@ -69,5 +69,8 @@ router.put("/updateStatus/:guestId/:userId",authentication,authorization,updateS
 router.post("/banquetHall",banquetHall)
 router.get("/getbanquetHall/:userId",authentication,authorization,getbanquetHall)
 router.put("/updateStatusOfBanquetHall/:banquetId/:userId",authentication,authorization,updateStatusOfBanquetHall)
+
+//========================================================================
+
 module.exports = router;
 
