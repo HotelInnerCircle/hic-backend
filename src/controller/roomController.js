@@ -65,17 +65,19 @@ let updateRooms = async (req,res)=>{
 }
 
 
-const getRooms = async(req,res)=>{
+const getRooms = async (req, res) => {
     try {
-        let data = await roomModel.find({isDeleted:false, is_block:false}).select("price" ).sort({createdAt:-1})
-        if(!data){
-            return res.status(404).send({status:false,message:"no data found"})
+        let data = await roomModel.find({ isDeleted: false, is_block: false })
+        //    .select("price", "description") // Correct usage of.select() with multiple arguments
+           .sort({ createdAt: -1 });
+        if (!data || data.length === 0) { // Check if data is empty
+            return res.status(404).send({ status: false, message: "no data found" });
         }
-        return res.status(200).send({status:true,data:data})
+        return res.status(200).send({ status: true, data: data });
     } catch (error) {
-        return res.status(500).send({status:false, message:error.message}) 
+        return res.status(500).send({ status: false, message: error.message });
     }
-}
+};
 
 
 
