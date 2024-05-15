@@ -78,6 +78,19 @@ const getRooms = async (req, res) => {
         return res.status(500).send({ status: false, message: error.message });
     }
 };
+const getroomPrice = async(req,res)=>{
+    try {
+        let data = await roomModel.find({ isDeleted: false, is_block: false })
+           .select("price",) // Correct usage of.select() with multiple arguments
+           .sort({ createdAt: -1 });
+        if (!data || data.length === 0) { // Check if data is empty
+            return res.status(404).send({ status: false, message: "no data found" });
+        }
+        return res.status(200).send({ status: true, data: data });
+    } catch (error) {
+        return res.status(500).send({ status: false, message: error.message });
+    }
+}
 
 
 
@@ -85,5 +98,6 @@ module.exports= {
     createRooms ,
     getRooms,
     updateRooms , 
+    getroomPrice
     //   addRoom
     }

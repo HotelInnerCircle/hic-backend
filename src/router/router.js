@@ -6,6 +6,7 @@ const {
   createRooms,
   getRooms,
   updateRooms,
+  getroomPrice
 } = require("../controller/roomController");
 
 const {
@@ -44,6 +45,7 @@ router.post("/login", login);
 // router.post("/createrooms", createRooms)
 router.post("/createRooms/:userId",authentication,authorization, createRooms); // by admin
 router.get("/getRooms/:userId",authentication,authorization, getRooms); // by admin
+router.get("/getroomPrice",getroomPrice)
 router.put("/updateRooms/:userId",authentication,authorization, updateRooms); // by admin
 //=======================================================================
 router.post("/bookedRooms/:userId",authentication,authorization, bookedRooms); // by admin
